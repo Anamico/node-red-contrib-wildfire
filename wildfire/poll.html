@@ -1,0 +1,62 @@
+<script type="text/javascript">
+    RED.nodes.registerType('poll wildfire', {
+        category: 'wildfire',
+        color: '#3A98D6',
+        defaults: {
+            name: { value : "" },
+            wildfire: { type: 'wildfire service', required: true },
+            persistenceFile: { value : "/data/wildfireTimestamp", required: true }
+        },
+        inputs: 1,
+        outputs: 2,
+        inputLabels: "trigger",
+        outputLabels: ["reputations","metadata"],
+        paletteLabel: 'poll wildfire',
+        icon: "wildfire.png",
+        label: function() {
+            return this.name || 'poll wildfire';
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="poll wildfire">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-wildfire"><i class="fa fa-server"></i> Service</label>
+        <input type="text" id="node-input-wildfire" placeholder="wildfire">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-persistenceFile"><i class="fa fa-file"></i> Persistence File</label>
+        <input type="text" id="node-input-persistenceFile">
+    </div>
+    <div class="form-tips"><b>Tip:</b> The Persistence File is a path to a json file used to persist the "Last Update Timestamp".</div>
+
+</script>
+
+<script type="text/x-red" data-help-name="poll wildfire">
+    <p>Poll Wildfire to get changed verdicts. Outputs a payload per verdict.</p>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload
+            <span class="property-type">0 to n file reputation payloads pre-formatted for McAfee TIE set reputation DXL call</span>
+        </dt>
+        <dt>metadata
+            <span class="property-type">information/stats on the last successful poll</span>
+        </dt>
+    </dl>
+    <h3>Details</h3>
+    <p>Note: This node currently only processes verdicts as:
+        <ul>
+            <li>0 (benign) = MOST_LIKELY_TRUSTED,</li>
+            <li>1 (malware) = KNOWN_MALICIOUS,</li>
+            <li>2 (grayware) = ignored, or</li>
+            <li>3 (phishing) = ignored</li>
+        </ul>
+        any other status is currently ignored.
+    </p>
+</script>
