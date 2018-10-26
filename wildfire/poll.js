@@ -60,7 +60,7 @@ module.exports = function(RED) {
                 }],
             
                 persist: ['streamReputations', function(data, callback) {
-                    const lastTimestamp = data.proofpoint.queryEndTime;
+                    const lastTimestamp = data.lastTimestamp;
                     console.log('persist?', lastTimestamp);
                     if ( !lastTimestamp || msg.payload.timestamp ) {
                         return callback(null);

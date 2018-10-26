@@ -1,5 +1,4 @@
 const fs = require('fs');
-const request = require('request');
 const async = require('async');
 
 const constant = {
@@ -30,47 +29,16 @@ const constant = {
 
         // reference: https://help.proofpoint.com/Threat_Insight_Dashboard/API_Documentation/SIEM_API
         // todo: make these default but customizable per environment/install?
-        fromProofpoint: function(sandboxStatus) {
-            if (sandboxStatus == 'threat') {
+        fromWildfire: function(verdict) {
+            if (verdict == '1') {
                 return trustLevel.KNOWN_MALICIOUS;
-            }
-            if (sandboxStatus == 'clean') {
-                return trustLevel.MOST_LIKELY_TRUSTED;
             }
             return null;
         }
     }
 };
 
-function extractAttachmentReputations(blocked, processReputation, message, mainCallback) {
-    console.log('processing message', {
-        messageID: message.messageID,               // increasing certainty: 0-100
-        spamScore: message.spamScore,               // increasing certainty: 0-100
-        impostorScore: message.impostorScore,       // increasing certainty: 0-100
-        malwareScore: message.malwareScore          // increasing certainty: 0-100
-    });
-    async.eachSeries(message.messageParts || [], function(part, callback) {
-        console.log('  processing part, sandboxStatus = ', part.sandboxStatus);
-        const trustLevel = constant.trustLevel.fromProofpoint(part.sandboxStatus);
-        if (trustLevel) {       // currently only 'threat' and 'clean'
-            const payload = {
-                trustLevel: trustLevel,
-                providerId: constant.fileProvider.ENTERPRISE,
-                filename: part.filename,
-                comment: "from Proofpoint",
-                hashes: [{
-                    type: constant.hashType.MD5,
-                    value: part.md5
-                }, {
-                    type: constant.hashType.SHA256,
-                    value: part.sha256
-                }]
-            };
-            return processReputation(payload, callback);
-        }
-        callback(null);
-    }, mainCallback);
-}
+
 
 
 
@@ -125,29 +93,33 @@ module.exports = {
         //             "interval=" + startTime + "/" + endTime;
                     
         return {
-            date: '2018-10-20'
+            date: '2018-10-25'
         };
     },
 
-    extractReputations: function(payload, processReputation, callback) {
-        async.auto({
-            messagesBlocked: function(callback) {
-                async.eachSeries(payload.messagesBlocked || [],
-                    extractAttachmentReputations.bind(this, true, processReputation),
-                    callback);
-            },
-            messagesDelivered: function(callback) {
-                async.eachSeries(payload.messagesBlocked || [],
-                    extractAttachmentReputations.bind(this, false, processReputation),
-                    callback);
-            },
-            clicksBlocked: function(callback) {
-                callback(null);
-            },
-            clicksPermitted: function(callback) {
-                callback(null);
+    extractReputations: function(verdicts, processReputation, callback) {
+        async.eachSeries(verdicts, function(verdict, callback) {
+            if (verdict.verdict != 1) {
+                return callback(null);
             }
-        }, callback);
+            const trustLevel = 1; //constant.trustLevel.fromWildfire(verdict.verdict);
+            const payload = {
+                trustLevel: trustLevel,
+                providerId: constant.fileProvider.ENTERPRISE,
+                filename: 'WildFire.unknown',
+                comment: "from Wildfire",
+                hashes: [{
+                    type: constant.hashType.MD5,
+                    value: verdict.md5
+                }, {
+                    type: constant.hashType.SHA256,
+                    value: verdict.sha256
+                }]
+            };
+            processReputation(payload, callback);
+        }, function(err) {
+            console.log('completed', err);
+        });
     },
 
     persistLastTimeStamp: function (persistenceFilePath, timestamp, callback) {

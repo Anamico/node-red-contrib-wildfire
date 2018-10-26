@@ -30,6 +30,7 @@
   "bugs": "https://github.com/Anamico/node-red-contrib-wildfire/issues",
   "dependencies": {
     "async": "^2.6.1",
+    "fast-xml-parser": "^3.12.5",
     "request": "^2.88.0"
   },
   "keywords": [
