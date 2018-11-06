@@ -75,16 +75,16 @@ module.exports = {
      * @param {*} config 
      */
     wildfireParams: function (lastTimestamp) {
-        const now = (new Date()).getTime() / 1000; //- tzoffset
-        const oldestAllowed = now - (14 * 24 * 60 * 60) + 60; // allow a 1 minute buffer
+        // const now = (new Date()).getTime() / 1000; //- tzoffset
+        // const oldestAllowed = now - (14 * 24 * 60 * 60) + 60; // allow a 1 minute buffer
 
-        const startUnix = Math.max(
-            (lastTimestamp && ((new Date(lastTimestamp)).getTime() / 1000)) || 0,
-            oldestAllowed);
+        // const startUnix = Math.max(
+        //     (lastTimestamp && ((new Date(lastTimestamp)).getTime() / 1000)) || 0,
+        //     oldestAllowed);
 
-        const endUnix = Math.min(
-            startUnix + (60 * 60),
-            now);
+        // const endUnix = Math.min(
+        //     startUnix + (60 * 60),
+        //     now);
 
         // const startTime = new Date(startUnix * 1000).toISOString();
         // const endTime = new Date(endUnix * 1000).toISOString();
@@ -93,7 +93,7 @@ module.exports = {
         //             "interval=" + startTime + "/" + endTime;
                     
         return {
-            date: '2018-10-25'
+            date: lastTimestamp
         };
     },
 
@@ -108,13 +108,10 @@ module.exports = {
                 providerId: constant.fileProvider.ENTERPRISE,
                 filename: 'WildFire.unknown',
                 comment: "from Wildfire",
-                hashes: [{
-                    type: constant.hashType.MD5,
-                    value: verdict.md5
-                }, {
-                    type: constant.hashType.SHA256,
-                    value: verdict.sha256
-                }]
+                hashes: {
+                    md5: verdict.md5,
+                    sha256: verdict.sha256
+                }
             };
             processReputation(payload, callback);
         }, function(err) {

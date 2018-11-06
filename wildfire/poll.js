@@ -47,11 +47,10 @@ module.exports = function(RED) {
                 
                 // todo: stream to a lexical parser to avoid latency and memory overheads
                 streamReputations: ['wildfire', function(data, callback) {
+                    console.log(data.wildfire);
                     util.extractReputations(data.wildfire, function(reputation, callback) {
-                        console.log('handle reputation', reputation);
-                        node.send([{
-                            payload: reputation
-                        }]);
+                        //node.send([ reputation ]);
+                        node.send([reputation]);
                         callback(null);
                     }, function(err, data) {
                         console.log('stream response', data);

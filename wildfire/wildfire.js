@@ -12,15 +12,15 @@ module.exports = function(RED) {
 
         this.samples = function (params, callback) {
 
-            // if (!config.server) {
-            //     callback(new Error('Missing Appliance Hostname/IP'));
-            //     return;
-            // }
+            if (!config.server) {
+                callback(new Error('Missing Appliance Hostname/IP'));
+                return;
+            }
             const server = config.server.trim().toLowerCase() || "wildfire.paloaltonetworks.com";
-            // if (server == 'wildfire.paloaltonetworks.com') {
-            //     callback(new Error('Cloud Retrieval not Supported, Use your appliance address'));
-            //     return;
-            // }
+            if (server == 'wildfire.paloaltonetworks.com') {
+                callback(new Error('Cloud Retrieval not Supported, Use your appliance address'));
+                return;
+            }
 
             if (!config.apikey) {
                 callback(new Error('Missing Apikey'));
@@ -35,8 +35,7 @@ module.exports = function(RED) {
                 return;
             }
 
-            const uri = /*(config.apikey == 'test') ? 'https://wildfire.paloaltonetworks.com/publicapi/test/pe' : */
-                'https://' + server + '/publicapi/get/verdicts/changed';
+            const uri = 'https://' + ( config.server == 'test' ? 'wildfire.paloaltonetworks.com' : server ) + '/publicapi/get/verdicts/changed';
 
             request({
                 method: 'POST',
