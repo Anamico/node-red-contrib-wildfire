@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-wildfire",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Wildfire nodes for Node-RED",
   "main": "index.js",
   "scripts": {
